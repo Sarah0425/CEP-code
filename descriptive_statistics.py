@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-# 读取Excel数据
+# read Excel file
 df = pd.read_excel('data for the whole period.xlsx', sheet_name='Sheet1')
 
 # Drop 'Date', 'Demand_difference', and 'CII' columns for descriptive statistics
@@ -25,12 +25,12 @@ df.set_index('Date', inplace=True)
 columns_to_plot = columns_to_describe.columns
 for column in columns_to_plot:
     plt.figure(figsize=(12, 6))
-    # 绘制整个时间序列
+    # plot the whole time series
     sns.lineplot(data=df[column], label=f'{column}')
-    # 高亮12月和1月的数据点
+    # highlight Dec. and Jan.
     highlighted_data = df[column][(df.index.month == 12) | (df.index.month == 1)]
     plt.scatter(highlighted_data.index, highlighted_data, color='purple', label='Dec-Jan Data', zorder=3)
-    # 添加战争开始的红色垂直线
+    # add red vline for the start of war
     plt.axvline(pd.Timestamp('2022-02-22'), color='red', linestyle='--', linewidth=2, label='Start of Conflict')
     plt.title(f'Time Series Plot for {column}')
     plt.xlabel('Date')
