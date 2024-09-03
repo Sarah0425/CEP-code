@@ -9,25 +9,25 @@ data = pd.read_excel('test model.xlsx', sheet_name='Sheet1')
 data['Date'] = pd.to_datetime(data['Date'])
 data.rename(columns={'Date': 'ds', 'Total Demand': 'y'}, inplace=True)
 
-# 提取2022年2月22日之前的总电力需求数据
+
 pre_war_data = data.loc[data['ds'] <= '2022-02-22']
-# 提取2022年2月22日之后的数据
+
 post_war_data = data.loc[data['ds'] > '2022-02-22']
 
-# 创建Prophet模型并进行训练
+# build Prophet
 model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False)
 
-# 添加自定义季节性
+# add seasonality
 model.add_seasonality(name='annual', period=365, fourier_order=10)
 model.add_seasonality(name='weekly', period=7, fourier_order=3)
 
 model.fit(pre_war_data)
 
-# 进行未来630天的预测
+# forecast for future 630-days
 future = model.make_future_dataframe(periods=630)
 forecast = model.predict(future)
 
-# 绘制实际值与预测值对比图
+# Plot the actual value versus the predicted value
 fig, ax = plt.subplots(figsize=(14, 7))
 model.plot(forecast, ax=ax)
 ax.plot(pre_war_data['ds'], pre_war_data['y'], label='Actual', color='black')
@@ -50,7 +50,7 @@ plt.title('Prophet Model - Actual vs Forecast2')
 plt.savefig('demand_difference.png')
 plt.close()
 
-# 显示预测结果
+# show the forecast results
 print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(365))
-# 将预测结果保存到新的Excel文件中
+# save
 forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].to_excel('forecast_results.xlsx', index=False)
